@@ -17,8 +17,6 @@ RUN set -ex; \
 		libpq-dev \
 		libxml2-dev \
 		libmagickwand-dev \
-		libmcrypt-dev \
-		libmcrypt-dev \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
@@ -36,7 +34,6 @@ RUN set -ex; \
 		dom \
 		soap \
 		sockets \
-		mcrypt \
 		intl \
 		bcmath \
 		gettext \

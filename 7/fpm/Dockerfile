@@ -18,7 +18,6 @@ RUN set -ex; \
 		libxml2-dev \
 		libmagickwand-dev \
 		libmcrypt-dev \
-		libmcrypt-dev \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
