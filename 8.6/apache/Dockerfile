@@ -66,12 +66,12 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-WORKDIR /var/www/html
 
-# https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.6.14
-ENV DRUPAL_MD5 04cf60554a5036c7a69c652e669461c3
-
+# as per https://hub.docker.com/_/php/
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
 
 # removed download of Drupal files, we'll use composer instead
 # addiitional bits for d8-civicrm, composer + other build dependencies
