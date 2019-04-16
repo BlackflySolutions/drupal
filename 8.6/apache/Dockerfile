@@ -53,6 +53,7 @@ RUN { \
 
 
 # as per https://hub.docker.com/_/php/
+RUN mkdir -p /var/www/drupal
 ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
@@ -67,5 +68,6 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install -g bower
 # create a user to own the drupal code and run the build process
-RUN useradd -b /var/www -ms /bin/bash drupal
+RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+RUN chown drupal:www-data /var/www/drupal
 # vim:set ft=dockerfile:
