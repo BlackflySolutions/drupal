@@ -57,10 +57,15 @@ WORKDIR /var/www/html
 ENV DRUPAL_VERSION 8.6.14
 ENV DRUPAL_MD5 04cf60554a5036c7a69c652e669461c3
 
-RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz \
-	&& echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c - \
-	&& tar -xz --strip-components=1 -f drupal.tar.gz \
-	&& rm drupal.tar.gz \
-	&& chown -R www-data:www-data sites modules themes
 
+# removed download of Drupal files, we'll use composer instead
+# addiitional bits for d8-civicrm, composer + other build dependencies
+# TODO: cleanup using the new docker thing to replace the build pattern!
+ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
+# create a user to own the drupal code and run the build process
+RUN useradd -b /var/www -ms /bin/bash drupal
 # vim:set ft=dockerfile:
