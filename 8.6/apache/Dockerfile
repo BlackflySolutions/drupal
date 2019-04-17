@@ -52,22 +52,14 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 
-# as per https://hub.docker.com/_/php/
+# change the document root as per https://hub.docker.com/_/php/
 RUN mkdir -p /var/www/drupal
 ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 WORKDIR /var/www/drupal
 
-# removed download of Drupal files, we'll use composer instead
-# addiitional bits for d8-civicrm, composer + other build dependencies
-# TODO: cleanup using the new docker thing to replace the build pattern!
-ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y nodejs
-RUN npm install -g bower
-# create a user to own the drupal code and run the build process
-RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
-RUN chown drupal:www-data /var/www/drupal
+# removed download of Drupal files, we'll use the recommended composer build process instead and build it entirely in the persistent volume, so we
+# can't build it in the image (until we're older and smarter).
+
 # vim:set ft=dockerfile:
