@@ -42,7 +42,7 @@ RUN set -ex; \
 		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
+  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
