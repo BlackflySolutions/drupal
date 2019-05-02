@@ -21,6 +21,7 @@ RUN set -ex; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+                imagemagick \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
@@ -42,10 +43,10 @@ RUN set -ex; \
 		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
+  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
