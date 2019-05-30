@@ -15,7 +15,6 @@ RUN set -ex; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-<<<<<<< HEAD
 		libxml2-dev \
 		libmagickwand-dev \
 		libicu-dev \
