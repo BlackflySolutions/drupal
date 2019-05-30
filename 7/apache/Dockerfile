@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.1-apache
+FROM php:7.2-apache
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -21,6 +21,7 @@ RUN set -ex; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libzip-dev \
                 imagemagick \
 	; \
 	\

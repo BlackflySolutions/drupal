@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.2-fpm
+FROM php:7.3-fpm
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -20,6 +20,7 @@ RUN set -ex; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \

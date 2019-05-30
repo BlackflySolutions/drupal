@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.2-apache
+FROM php:5.6-apache
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -17,9 +17,11 @@ RUN set -ex; \
 		libpq-dev \
 		libxml2-dev \
 		libmagickwand-dev \
+		libmcrypt-dev \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+                imagemagick \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
@@ -34,16 +36,17 @@ RUN set -ex; \
 		dom \
 		soap \
 		sockets \
+		mcrypt \
 		intl \
 		bcmath \
 		gettext \
 		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
+  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
@@ -68,14 +71,8 @@ RUN { \
 
 WORKDIR /var/www/html
 
-# https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.5.15
-ENV DRUPAL_MD5 7a4ba499132c834e5d33bccae5ac1430
-
-RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz \
-	&& echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c - \
+RUN curl -L "https://github.com/d6lts/drupal/tarball/6.x" > drupal.tar.gz \
 	&& tar -xz --strip-components=1 -f drupal.tar.gz \
-	&& rm drupal.tar.gz \
-	&& chown -R www-data:www-data sites modules themes
+	&& rm drupal.tar.gz 
 
 # vim:set ft=dockerfile:

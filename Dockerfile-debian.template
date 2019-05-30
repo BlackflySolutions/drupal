@@ -22,6 +22,7 @@ RUN set -ex; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
