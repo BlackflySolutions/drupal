@@ -1,0 +1,16 @@
+# maintain this 
+
+Update master from remote
+
+1. git checkout master
+2. git fetch upsteam
+3. git pull upstream
+4. git commit -m 'updated from remote'
+
+For each branch
+
+1. git checkout <branchname>
+2. git merge master
+[possible fixes]
+3. git commit
+4. git push origin
