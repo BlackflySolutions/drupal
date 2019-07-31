@@ -4,5 +4,4 @@ This is a fork of the official docker Drupal github project, adding in some bits
 
 ---
 
-
-[![Build Status](https://travis-ci.org/BlackflySolutions/drupal.svg?branch=master)](https://travis-ci.org/BlackflySolutions/drupal)
+[![Build Status](https://travis-ci.org/BlackflySolutions/drupal.svg?branch=civicrm-5)](https://travis-ci.org/BlackflySolutions/drupal)
