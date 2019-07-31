@@ -44,7 +44,6 @@ RUN set -eux; \
 		dom \
 		soap \
 		sockets \
-		mcrypt \
 		intl \
 		bcmath \
 		gettext \
@@ -55,6 +54,7 @@ RUN set -eux; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
   pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
+  pecl install -o mcrypt-1.0.2 && docker-php-ext-enable mcrypt; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
