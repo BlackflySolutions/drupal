@@ -50,8 +50,8 @@ RUN { \
 WORKDIR /var/www/html
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.8.3
-ENV DRUPAL_MD5 f524df904f9d4ba5586eed8203e1c58c
+ENV DRUPAL_VERSION 8.8.5
+ENV DRUPAL_MD5 11e595f6aa42fca4ab4423bff0b09c28
 
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
