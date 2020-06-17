@@ -58,17 +58,15 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-WORKDIR /var/www/html
 
-# https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.8.7
-ENV DRUPAL_MD5 cf073efecded37ef41122fb63b9721a2
+# change the document root as per https://hub.docker.com/_/php/
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
 
-RUN set -eux; \
-	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
-	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
-	tar -xz --strip-components=1 -f drupal.tar.gz; \
-	rm drupal.tar.gz; \
-	chown -R www-data:www-data sites modules themes
+# removed download of Drupal files, we'll use the recommended composer build process instead and build it entirely in the persistent volume, so we
+# can't build it in the image (until we're older and smarter).
 
 # vim:set ft=dockerfile:

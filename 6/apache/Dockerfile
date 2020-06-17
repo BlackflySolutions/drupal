@@ -1,9 +1,8 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.3-apache-stretch
-# TODO switch to buster once https://github.com/docker-library/php/issues/865 is resolved in a clean way (either in the PHP image or in PHP itself)
+FROM php:5.6-apache
 
 # install the PHP extensions we need
-RUN set -eux; \
+RUN set -ex; \
 	\
 	if command -v a2enmod; then \
 		a2enmod rewrite; \
@@ -13,30 +12,41 @@ RUN set -eux; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libfreetype6-dev \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libzip-dev \
+		libxml2-dev \
+		libmagickwand-dev \
+		libmcrypt-dev \
+		libicu-dev \
+		libc-client-dev \
+		libkrb5-dev \
+                imagemagick \
 	; \
 	\
-	docker-php-ext-configure gd \
-		--with-freetype-dir=/usr \
-		--with-jpeg-dir=/usr \
-		--with-png-dir=/usr \
-	; \
-	\
+	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
+		mysqli \
+		dom \
+		soap \
+		sockets \
+		mcrypt \
+		intl \
+		bcmath \
+		gettext \
+		imap \
 	; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
+  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
@@ -56,17 +66,13 @@ RUN { \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=60'; \
 		echo 'opcache.fast_shutdown=1'; \
+		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+WORKDIR /var/www/html
 
-# change the document root as per https://hub.docker.com/_/php/
-RUN mkdir -p /var/www/drupal
-ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-WORKDIR /var/www/drupal
-
-# removed download of Drupal files, we'll use the recommended composer build process instead and build it entirely in the persistent volume, so we
-# can't build it in the image (until we're older and smarter).
+RUN curl -L "https://github.com/d6lts/drupal/tarball/6.x" > drupal.tar.gz \
+	&& tar -xz --strip-components=1 -f drupal.tar.gz \
+	&& rm drupal.tar.gz 
 
 # vim:set ft=dockerfile:
