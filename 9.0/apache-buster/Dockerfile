@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:%%PHP_VERSION%%
+FROM php:7.4-apache-buster
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -16,13 +16,6 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libxml2-dev \
-		libmagickwand-dev \
-		libmcrypt-dev \
-		libmcrypt-dev \
-		libicu-dev \
-		libc-client-dev \
-		libkrb5-dev \
 		libzip-dev \
 	; \
 	\
@@ -31,25 +24,14 @@ RUN set -eux; \
 		--with-jpeg=/usr \
 	; \
 	\
-  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
-		mysqli \
-		dom \
-		soap \
-		sockets \
-		mcrypt \
-		intl \
-		bcmath \
-		gettext \
-		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -78,7 +60,7 @@ RUN { \
 COPY --from=composer:1.10 /usr/bin/composer /usr/local/bin/
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION %%VERSION%%
+ENV DRUPAL_VERSION 9.0.6
 
 WORKDIR /opt/drupal
 RUN set -eux; \

@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.4-fpm-alpine
+FROM php:7.4-fpm-alpine3.12
 
 # install the PHP extensions we need
 # postgresql-dev is needed for https://bugs.alpinelinux.org/issues/3642
@@ -46,11 +46,9 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-WORKDIR /var/www/html
-
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.8.7
-ENV DRUPAL_MD5 cf073efecded37ef41122fb63b9721a2
+ENV DRUPAL_VERSION 7.73
+ENV DRUPAL_MD5 1db5b6bbacbfd735849221a0a9fb982e
 
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \

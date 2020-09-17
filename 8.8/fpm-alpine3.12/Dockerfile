@@ -1,68 +1,40 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:%%PHP_VERSION%%
+FROM php:7.4-fpm-alpine3.12
 
 # install the PHP extensions we need
+# postgresql-dev is needed for https://bugs.alpinelinux.org/issues/3642
 RUN set -eux; \
 	\
-	if command -v a2enmod; then \
-		a2enmod rewrite; \
-	fi; \
-	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	\
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		libfreetype6-dev \
-		libjpeg-dev \
+	apk add --no-cache --virtual .build-deps \
+		coreutils \
+		freetype-dev \
+		libjpeg-turbo-dev \
 		libpng-dev \
-		libpq-dev \
-		libxml2-dev \
-		libmagickwand-dev \
-		libmcrypt-dev \
-		libmcrypt-dev \
-		libicu-dev \
-		libc-client-dev \
-		libkrb5-dev \
 		libzip-dev \
+		postgresql-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
 		--with-freetype \
-		--with-jpeg=/usr \
+		--with-jpeg=/usr/include \
 	; \
 	\
-  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
-		mysqli \
-		dom \
-		soap \
-		sockets \
-		mcrypt \
-		intl \
-		bcmath \
-		gettext \
-		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	apt-mark manual $savedAptMark; \
-	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
-		| sort -u \
-		| xargs -r dpkg-query -S \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -rt apt-mark manual; \
-	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --virtual .drupal-phpexts-rundeps $runDeps; \
+	apk del .build-deps
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -78,7 +50,7 @@ RUN { \
 COPY --from=composer:1.10 /usr/bin/composer /usr/local/bin/
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION %%VERSION%%
+ENV DRUPAL_VERSION 8.8.10
 
 WORKDIR /opt/drupal
 RUN set -eux; \

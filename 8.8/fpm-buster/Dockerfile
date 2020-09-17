@@ -1,6 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.4-apache-buster
-# TODO switch to buster once https://github.com/docker-library/php/issues/865 is resolved in a clean way (either in the PHP image or in PHP itself)
+FROM php:7.4-fpm-buster
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -17,11 +16,6 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libxml2-dev \
-		libmagickwand-dev \
-		libicu-dev \
-		libc-client-dev \
-		libkrb5-dev \
 		libzip-dev \
 	; \
 	\
@@ -30,24 +24,14 @@ RUN set -eux; \
 		--with-jpeg=/usr \
 	; \
 	\
-  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
-		mysqli \
-		dom \
-		soap \
-		sockets \
-		intl \
-		bcmath \
-		gettext \
-		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -72,15 +56,22 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# https://github.com/drupal/drupal/blob/9.0.1/composer.lock#L4052-L4053
+COPY --from=composer:1.10 /usr/bin/composer /usr/local/bin/
 
-# change the document root as per https://hub.docker.com/_/php/
-RUN mkdir -p /var/www/drupal
-ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-WORKDIR /var/www/drupal
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION 8.8.10
 
-# removed download of Drupal files, we'll use the recommended composer build process instead and build it entirely in the persistent volume, so we
-# can't build it in the image (until we're older and smarter).
+WORKDIR /opt/drupal
+RUN set -eux; \
+	export COMPOSER_HOME="$(mktemp -d)"; \
+	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
+	chown -R www-data:www-data web/sites web/modules web/themes; \
+	rmdir /var/www/html; \
+	ln -sf /opt/drupal/web /var/www/html; \
+	# delete composer cache
+	rm -rf "$COMPOSER_HOME"
+
+ENV PATH=${PATH}:/opt/drupal/vendor/bin
 
 # vim:set ft=dockerfile:

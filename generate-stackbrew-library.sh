@@ -1,10 +1,17 @@
-#!/bin/bash
-set -eu
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
 declare -A aliases=(
-	[8.8]='8 latest'
-	[8.9-rc]='rc'
+	[8.9]='8'
+	[9.0]='9 latest'
+	[9.1-rc]='rc'
 )
+
+defaultDebianSuite='buster'
+declare -A debianSuites=(
+	#[9.0]='buster'
+)
+defaultAlpineVersion='3.12'
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -30,6 +37,9 @@ dirCommit() {
 			$(git show HEAD:./Dockerfile | awk '
 				toupper($1) == "COPY" {
 					for (i = 2; i < NF; i++) {
+						if ($i ~ /^--from=/) {
+							next
+						}
 						print $i
 					}
 				}
@@ -37,19 +47,38 @@ dirCommit() {
 	)
 }
 
+gawkParents='
+	{ cmd = toupper($1) }
+	cmd == "FROM" {
+		print $2
+		next
+	}
+	cmd == "COPY" {
+		for (i = 2; i < NF; i++) {
+			if ($i ~ /^--from=/) {
+				gsub(/^--from=/, "", $i)
+				print $i
+				next
+			}
+		}
+	}
+'
+
 getArches() {
 	local repo="$1"; shift
-	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
 
-	eval "declare -g -A parentRepoToArches=( $(
-		find -name 'Dockerfile' -exec awk '
-				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
-					print "'"$officialImagesUrl"'" $2
-				}
-			' '{}' + \
+	local parentRepoToArchesStr
+	parentRepoToArchesStr="$(
+		find -name 'Dockerfile' -exec gawk "$gawkParents" '{}' + \
 			| sort -u \
-			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
-	) )"
+			| gawk -v officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/' '
+				$1 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
+					printf "%s%s\n", officialImagesUrl, $1
+				}
+			' \
+			| xargs -r bashbrew cat --format '["{{ .RepoName }}:{{ .TagName }}"]="{{ join " " .TagEntry.Architectures }}"'
+	)"
+	eval "declare -g -A parentRepoToArches=( $parentRepoToArchesStr )"
 }
 getArches 'drupal'
 
@@ -70,7 +99,8 @@ join() {
 
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
-	for variant in apache fpm fpm-alpine; do
+	for variant in {apache,fpm}-buster fpm-alpine3.12; do
+		[ -e "$version/$variant/Dockerfile" ] || continue
 		commit="$(dirCommit "$version/$variant")"
 
 		fullVersion="$(git show "$commit":"$version/$variant/Dockerfile" | awk '$1 == "ENV" && $2 == "DRUPAL_VERSION" { print $3; exit }')"
@@ -86,12 +116,35 @@ for version in "${versions[@]}"; do
 		)
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
+		debianSuite="${debianSuites[$version]:-$defaultDebianSuite}"
+		case "$variant" in
+			*-"$debianSuite") # "-apache-buster", -> "-apache"
+				variantAliases+=( "${versionAliases[@]/%/-${variant%-$debianSuite}}" )
+				;;
+			fpm-"alpine${defaultAlpineVersion}")
+				variantAliases+=( "${versionAliases[@]/%/-fpm-alpine}" )
+				;;
+		esac
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
-		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$version/$variant/Dockerfile")"
-		variantArches="${parentRepoToArches[$variantParent]}"
+		variantParents="$(gawk "$gawkParents" "$version/$variant/Dockerfile")"
+		variantArches=
+		for variantParent in $variantParents; do
+			parentArches="${parentRepoToArches[$variantParent]:-}"
+			if [ -z "$parentArches" ]; then
+				continue
+			elif [ -z "$variantArches" ]; then
+				variantArches="$parentArches"
+			else
+				variantArches="$(
+					comm -12 \
+						<(xargs -n1 <<<"$variantArches" | sort -u) \
+						<(xargs -n1 <<<"$parentArches" | sort -u)
+				)"
+			fi
+		done
 
-		if [ "$variant" = 'apache' ]; then
+		if [[ "$variant" = apache-* ]]; then
 			variantAliases+=( "${versionAliases[@]}" )
 		fi
 

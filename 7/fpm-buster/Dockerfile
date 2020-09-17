@@ -1,5 +1,5 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:%%PHP_VERSION%%
+FROM php:7.4-fpm-buster
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -18,7 +18,6 @@ RUN set -eux; \
 		libpq-dev \
 		libxml2-dev \
 		libmagickwand-dev \
-		libmcrypt-dev \
 		libmcrypt-dev \
 		libicu-dev \
 		libc-client-dev \
@@ -74,22 +73,15 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# https://github.com/drupal/drupal/blob/9.0.1/composer.lock#L4052-L4053
-COPY --from=composer:1.10 /usr/bin/composer /usr/local/bin/
-
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION %%VERSION%%
+ENV DRUPAL_VERSION 7.73
+ENV DRUPAL_MD5 1db5b6bbacbfd735849221a0a9fb982e
 
-WORKDIR /opt/drupal
 RUN set -eux; \
-	export COMPOSER_HOME="$(mktemp -d)"; \
-	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
-	chown -R www-data:www-data web/sites web/modules web/themes; \
-	rmdir /var/www/html; \
-	ln -sf /opt/drupal/web /var/www/html; \
-	# delete composer cache
-	rm -rf "$COMPOSER_HOME"
-
-ENV PATH=${PATH}:/opt/drupal/vendor/bin
+	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
+	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
+	tar -xz --strip-components=1 -f drupal.tar.gz; \
+	rm drupal.tar.gz; \
+	chown -R www-data:www-data sites modules themes
 
 # vim:set ft=dockerfile:
