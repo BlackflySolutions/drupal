@@ -1,8 +1,8 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.4-fpm-buster
+FROM php:7.0-apache
 
 # install the PHP extensions we need
-RUN set -eux; \
+RUN set -ex; \
 	\
 	if command -v a2enmod; then \
 		a2enmod rewrite; \
@@ -12,29 +12,41 @@ RUN set -eux; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		libfreetype6-dev \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libzip-dev \
+		libxml2-dev \
+		libmagickwand-dev \
+		libmcrypt-dev \
+		libicu-dev \
+		libc-client-dev \
+		libkrb5-dev \
+                imagemagick \
 	; \
 	\
-	docker-php-ext-configure gd \
-		--with-freetype \
-		--with-jpeg=/usr \
-	; \
-	\
+	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
+		mysqli \
+		dom \
+		soap \
+		sockets \
+		mcrypt \
+		intl \
+		bcmath \
+		gettext \
+		imap \
 	; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
+  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
@@ -54,24 +66,19 @@ RUN { \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=60'; \
 		echo 'opcache.fast_shutdown=1'; \
+		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# https://github.com/drupal/drupal/blob/9.0.1/composer.lock#L4052-L4053
-COPY --from=composer:1.10 /usr/bin/composer /usr/local/bin/
+WORKDIR /var/www/html
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 8.8.11
+ENV DRUPAL_VERSION 7.67
+ENV DRUPAL_MD5 78b1814e55fdaf40e753fd523d059f8d
 
-WORKDIR /opt/drupal
-RUN set -eux; \
-	export COMPOSER_HOME="$(mktemp -d)"; \
-	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
-	chown -R www-data:www-data web/sites web/modules web/themes; \
-	rmdir /var/www/html; \
-	ln -sf /opt/drupal/web /var/www/html; \
-	# delete composer cache
-	rm -rf "$COMPOSER_HOME"
-
-ENV PATH=${PATH}:/opt/drupal/vendor/bin
+RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz \
+	&& echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c - \
+	&& tar -xz --strip-components=1 -f drupal.tar.gz \
+	&& rm drupal.tar.gz \
+	&& chown -R www-data:www-data sites modules themes
 
 # vim:set ft=dockerfile:
