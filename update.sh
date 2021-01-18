@@ -10,10 +10,18 @@ fi
 versions=( "${versions[@]%/}" )
 
 # https://www.drupal.org/docs/8/system-requirements/php-requirements#php_required
-defaultPhpVersion='7.4'
+defaultPhpVersion='8.0'
 declare -A phpVersions=(
 	# https://www.drupal.org/docs/7/system-requirements/php-requirements#php_required
-	#[7]='7.2'
+	[7]='7.4'
+	[8.9]='7.4'
+	[9.0]='7.4'
+)
+
+declare -A composerVersions=(
+	[8.9]='1.10' # https://github.com/drupal/drupal/blob/8.9.12/composer.lock#L4357-L4358
+	[9.0]='1.10' # https://github.com/drupal/drupal/blob/9.0.10/composer.lock#L4448-L4449
+	[9.1]='2.0' # https://github.com/drupal/drupal/blob/9.1.2/composer.lock#L4730-L4731
 )
 
 for version in "${versions[@]}"; do
@@ -30,7 +38,7 @@ for version in "${versions[@]}"; do
 			;;
 		9.*)
 			# there is no https://updates.drupal.org/release-history/drupal/9.x (or 9.0.x)
-			# (07/2020) current could also be used for 8.7, 8.8, 8.9, 9.0, 9.1
+			# (07/2020) current could also be used for 8.9, 9.0, 9.1
 			drupalRelease='current'
 			;;
 	esac
@@ -66,16 +74,22 @@ for version in "${versions[@]}"; do
 		fi
 
 		phpImage="${phpVersions[$version]:-$defaultPhpVersion}-$variant"
+		sedArgs=(
+			-e 's/%%PHP_VERSION%%/'"${phpImage}"'/'
+			-e 's/%%VERSION%%/'"$fullVersion"'/'
+			-e 's/%%MD5%%/'"$md5"'/'
+		)
+
 		template="Dockerfile-$dist.template"
 		if [ "$version" = '7' ]; then
 			# 7 has no release in drupal/recommended-project
 			# so its Dockerfile is based on the old template
 			template="Dockerfile-7-$dist.template"
+		else
+			composerVersion="${composerVersions[$version]}"
+			sedArgs+=( -e 's/%%COMPOSER_VERSION%%/'"$composerVersion"'/' )
 		fi
-		sed -r \
-			-e 's/%%PHP_VERSION%%/'"${phpImage}"'/' \
-			-e 's/%%VERSION%%/'"$fullVersion"'/' \
-			-e 's/%%MD5%%/'"$md5"'/' \
-		"$template" > "$version/$variant/Dockerfile"
+
+		sed -r "${sedArgs[@]}" "$template" > "$version/$variant/Dockerfile"
 	done
 done

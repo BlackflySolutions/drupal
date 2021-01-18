@@ -1,5 +1,5 @@
-# from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:7.4-apache-buster
+# from https://www.drupal.org/docs/system-requirements/php-requirements
+FROM php:8.0-fpm-buster
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -70,7 +70,6 @@ RUN { \
 		echo 'opcache.revalidate_freq=60'; \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-
 
 # change the document root as per https://hub.docker.com/_/php/
 RUN mkdir -p /var/www/drupal
