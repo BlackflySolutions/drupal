@@ -1,4 +1,4 @@
-# from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
+# from https://www.drupal.org/docs/system-requirements/php-requirements
 FROM php:7.4-apache-buster
 
 # install the PHP extensions we need
@@ -57,8 +57,8 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.75
-ENV DRUPAL_MD5 a8c58a02395db013764361692cebe5aa
+ENV DRUPAL_VERSION 7.77
+ENV DRUPAL_MD5 3594011c69191ce8804f27c698d18b0e
 
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
