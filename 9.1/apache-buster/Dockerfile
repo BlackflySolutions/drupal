@@ -64,3 +64,4 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 WORKDIR /var/www/drupal
 # removed upstream composer method of building Drupal code.
 
+# vim:set ft=dockerfile:
