@@ -71,7 +71,6 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# change the document root as per https://hub.docker.com/_/php/
 RUN mkdir -p /var/www/drupal
 ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
