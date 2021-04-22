@@ -70,7 +70,7 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 WORKDIR /var/www/html
-
+ADD https://api.github.com/repos/d6lts/drupal/git/refs/heads/6.x version.json
 RUN curl -L "https://github.com/d6lts/drupal/tarball/6.x" > drupal.tar.gz \
 	&& tar -xz --strip-components=1 -f drupal.tar.gz \
 	&& rm drupal.tar.gz 
