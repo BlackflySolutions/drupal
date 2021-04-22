@@ -1,0 +1,58 @@
+{
+  "7": {
+    "md5": "cfbbc4cde2782f4e7298db3991ca6f56",
+    "phpVersions": [
+      "7.4"
+    ],
+    "variants": [
+      "apache-buster",
+      "fpm-buster",
+      "fpm-alpine3.12"
+    ],
+    "version": "7.80"
+  },
+  "8.9": {
+    "composer": {
+      "version": "1.10"
+    },
+    "md5": "d4c987a503f9e637b4cc80b48307e50d",
+    "phpVersions": [
+      "7.4"
+    ],
+    "variants": [
+      "apache-buster",
+      "fpm-buster",
+      "fpm-alpine3.12"
+    ],
+    "version": "8.9.14"
+  },
+  "9.0": {
+    "composer": {
+      "version": "1.10"
+    },
+    "phpVersions": [
+      "7.4"
+    ],
+    "variants": [
+      "apache-buster",
+      "fpm-buster",
+      "fpm-alpine3.12"
+    ],
+    "version": "9.0.12"
+  },
+  "9.1": {
+    "composer": {
+      "version": "2.0"
+    },
+    "phpVersions": [
+      "8.0",
+      "7.4"
+    ],
+    "variants": [
+      "apache-buster",
+      "fpm-buster",
+      "fpm-alpine3.12"
+    ],
+    "version": "9.1.7"
+  }
+}
