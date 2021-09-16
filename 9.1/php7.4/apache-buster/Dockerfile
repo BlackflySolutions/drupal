@@ -22,6 +22,11 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
+		libxml2-dev \
+		libmagickwand-dev \
+		libicu-dev \
+		libc-client-dev \
+		libkrb5-dev \
 		libzip-dev \
 	; \
 	\
@@ -30,14 +35,24 @@ RUN set -eux; \
 		--with-jpeg=/usr \
 	; \
 	\
+  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
+		mysqli \
+		dom \
+		soap \
+		sockets \
+		intl \
+		bcmath \
+		gettext \
+		imap \
 	; \
 	\
+  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -63,11 +78,11 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # change the document root as per https://hub.docker.com/_/php/
-  RUN mkdir -p /var/www/drupal
-  ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
-  RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-  RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-  WORKDIR /var/www/drupal
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
 # removed upstream composer method of building Drupal code.
 
 # vim:set ft=dockerfile:
