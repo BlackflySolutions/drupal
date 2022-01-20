@@ -5,7 +5,7 @@
 #
 
 # from https://www.drupal.org/docs/system-requirements/php-requirements
-FROM php:7.4-apache-buster
+FROM php:8.0-fpm-bullseye
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -22,11 +22,6 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libxml2-dev \
-		libmagickwand-dev \
-		libicu-dev \
-		libc-client-dev \
-		libkrb5-dev \
 		libzip-dev \
 	; \
 	\
@@ -35,24 +30,14 @@ RUN set -eux; \
 		--with-jpeg=/usr \
 	; \
 	\
-  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
-		mysqli \
-		dom \
-		soap \
-		sockets \
-		intl \
-		bcmath \
-		gettext \
-		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -77,15 +62,21 @@ RUN { \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-# https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.87
-ENV DRUPAL_MD5 75200b0b3f00140f25a990cb1ef35789
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION 9.3.3
+
+WORKDIR /opt/drupal
 RUN set -eux; \
-	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
-	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
-	tar -xz --strip-components=1 -f drupal.tar.gz; \
-	rm drupal.tar.gz; \
-	chown -R www-data:www-data sites modules themes
+	export COMPOSER_HOME="$(mktemp -d)"; \
+	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
+	chown -R www-data:www-data web/sites web/modules web/themes; \
+	rmdir /var/www/html; \
+	ln -sf /opt/drupal/web /var/www/html; \
+	# delete composer cache
+	rm -rf "$COMPOSER_HOME"
+
+ENV PATH=${PATH}:/opt/drupal/vendor/bin
 
 # vim:set ft=dockerfile:

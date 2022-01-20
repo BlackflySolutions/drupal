@@ -5,7 +5,7 @@
 #
 
 # from https://www.drupal.org/docs/system-requirements/php-requirements
-FROM php:7.4-apache-buster
+FROM php:7.4-apache-bullseye
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -22,11 +22,6 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libxml2-dev \
-		libmagickwand-dev \
-		libicu-dev \
-		libc-client-dev \
-		libkrb5-dev \
 		libzip-dev \
 	; \
 	\
@@ -35,24 +30,14 @@ RUN set -eux; \
 		--with-jpeg=/usr \
 	; \
 	\
-  docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
-		mysqli \
-		dom \
-		soap \
-		sockets \
-		intl \
-		bcmath \
-		gettext \
-		imap \
 	; \
 	\
-  RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
