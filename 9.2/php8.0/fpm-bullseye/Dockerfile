@@ -5,7 +5,7 @@
 #
 
 # from https://www.drupal.org/docs/system-requirements/php-requirements
-FROM php:8.0-apache-buster
+FROM php:8.0-fpm-bullseye
 
 # install the PHP extensions we need
 RUN set -eux; \
