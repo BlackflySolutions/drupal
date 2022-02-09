@@ -1,6 +1,7 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
 FROM php:5.6-apache
-
+# 2022-01-20, update for expiring letsencrypt root and apache vulnerabilities
+RUN apt-get update && apt-get upgrade -y
 # install the PHP extensions we need
 RUN set -ex; \
 	\
