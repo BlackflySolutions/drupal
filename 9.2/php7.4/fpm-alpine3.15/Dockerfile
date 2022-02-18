@@ -15,6 +15,7 @@ RUN set -eux; \
 		freetype-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
+		libwebp-dev \
 		libzip-dev \
 # postgresql-dev is needed for https://bugs.alpinelinux.org/issues/3642
 		postgresql-dev \
@@ -23,6 +24,7 @@ RUN set -eux; \
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr/include \
+		--with-webp \
 	; \
 	\
 	docker-php-ext-install -j "$(nproc)" \
@@ -55,7 +57,7 @@ RUN { \
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 9.2.12
+ENV DRUPAL_VERSION 9.2.13
 
 WORKDIR /opt/drupal
 RUN set -eux; \
