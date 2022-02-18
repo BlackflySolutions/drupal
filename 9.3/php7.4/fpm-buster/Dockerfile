@@ -29,12 +29,14 @@ RUN set -eux; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libwebp-dev \
 		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
+		--with-webp \
 	; \
 	\
   docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
@@ -83,7 +85,7 @@ RUN { \
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 9.3.5
+ENV DRUPAL_VERSION 9.3.6
 
 WORKDIR /opt/drupal
 RUN set -eux; \

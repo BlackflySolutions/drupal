@@ -27,12 +27,14 @@ RUN set -eux; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libwebp-dev \
 		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
+		--with-webp \
 	; \
 	\
   docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
