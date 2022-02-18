@@ -1,8 +1,11 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
-FROM php:5.6-apache
+FROM php:7.3-apache-stretch
+# TODO switch to buster once https://github.com/docker-library/php/issues/865 is resolved in a clean way (either in the PHP image or in PHP itself)
 
+# 2021-09-30, update for expiring letsencrypt root
+RUN apt-get update && apt-get upgrade -y
 # install the PHP extensions we need
-RUN set -ex; \
+RUN set -eux; \
 	\
 	if command -v a2enmod; then \
 		a2enmod rewrite; \
@@ -12,6 +15,7 @@ RUN set -ex; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libfreetype6-dev \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
@@ -21,10 +25,16 @@ RUN set -ex; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libzip-dev \
                 imagemagick \
 	; \
 	\
-	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+	docker-php-ext-configure gd \
+		--with-freetype-dir=/usr \
+		--with-jpeg-dir=/usr \
+		--with-png-dir=/usr \
+	; \
+	\
   docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
@@ -36,7 +46,6 @@ RUN set -ex; \
 		dom \
 		soap \
 		sockets \
-		mcrypt \
 		intl \
 		bcmath \
 		gettext \
@@ -47,6 +56,7 @@ RUN set -ex; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
   pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick; \
+  pecl install -o mcrypt-1.0.2 && docker-php-ext-enable mcrypt; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
 		| awk '/=>/ { print $3 }' \
 		| sort -u \
@@ -66,14 +76,14 @@ RUN { \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=60'; \
 		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 WORKDIR /var/www/html
 
-ENV CK_VERSION 7.x-2.64
+ENV CK_VERSION 7.x-2.71
 
-RUN curl -fSL "https://ftp.drupal.org/files/projects/commerce_kickstart-${CK_VERSION}-core.tar.gz" -o drupal.tar.gz \
+RUN set -eux; \
+        curl -fSL "https://ftp.drupal.org/files/projects/commerce_kickstart-${CK_VERSION}-core.tar.gz" -o drupal.tar.gz \
 	&& tar -xz --strip-components=1 -f drupal.tar.gz \
 	&& rm drupal.tar.gz 
 
