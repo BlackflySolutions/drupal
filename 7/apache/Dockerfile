@@ -2,7 +2,7 @@
 FROM php:7.3-apache-stretch
 # TODO switch to buster once https://github.com/docker-library/php/issues/865 is resolved in a clean way (either in the PHP image or in PHP itself)
 # 2021-09-30, update for expiring letsencrypt root and apache vulnerabilities
-RUN apt-get update && apt-get upgrade -y
+# RUN apt-get update && apt-get upgrade -y
 # install the PHP extensions we need
 RUN set -eux; \
 	\
