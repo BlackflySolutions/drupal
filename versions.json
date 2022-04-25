@@ -4,7 +4,7 @@
       "version": "2"
     },
     "phpVersions": [
-      "8.0"
+      "8.1"
     ],
     "variants": [
       "apache-bullseye",
@@ -14,10 +14,10 @@
       "fpm-alpine3.15",
       "fpm-alpine3.14"
     ],
-    "version": "10.0.0-alpha1"
+    "version": "10.0.0-alpha3"
   },
   "7": {
-    "md5": "ff1a687492ea18e22cfb009198a7dafc",
+    "md5": "924e707e3b1e8269fe623cf2f22ee710",
     "phpVersions": [
       "7.4"
     ],
@@ -29,7 +29,7 @@
       "fpm-alpine3.15",
       "fpm-alpine3.14"
     ],
-    "version": "7.88"
+    "version": "7.89"
   },
   "9.2": {
     "composer": {
@@ -47,7 +47,7 @@
       "fpm-alpine3.15",
       "fpm-alpine3.14"
     ],
-    "version": "9.2.13"
+    "version": "9.2.18"
   },
   "9.3": {
     "composer": {
@@ -65,6 +65,6 @@
       "fpm-alpine3.15",
       "fpm-alpine3.14"
     ],
-    "version": "9.3.6"
+    "version": "9.3.12"
   }
 }
