@@ -14,5 +14,10 @@ It's forked only in the Docker.template file, and in two ways:
 
 To see details of the changes, use:
 
-git diff master origin/master
+git diff upstream/master origin/docker-library
 
+## Maintenance
+
+When the docker-library upstream changes, the usual way to update the simuliidae branch is:
+1. git fetch upstream/master
+2. git merge upstream/master simuliidae
