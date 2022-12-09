@@ -11,26 +11,25 @@
       "fpm-bullseye",
       "apache-buster",
       "fpm-buster",
-      "fpm-alpine3.16",
-      "fpm-alpine3.15"
+      "fpm-alpine3.17",
+      "fpm-alpine3.16"
     ],
-    "version": "10.0.0-beta2"
+    "version": "10.0.0-rc2"
   },
   "7": {
-    "md5": "7f95bd4a6693ed5215aba4038c23c933",
+    "md5": "617617081b622a3b32757c7166cbf88f",
     "phpVersions": [
-      "8.0",
-      "7.4"
+      "8.0"
     ],
     "variants": [
       "apache-bullseye",
       "fpm-bullseye",
       "apache-buster",
       "fpm-buster",
-      "fpm-alpine3.16",
-      "fpm-alpine3.15"
+      "fpm-alpine3.17",
+      "fpm-alpine3.16"
     ],
-    "version": "7.92"
+    "version": "7.93"
   },
   "9.3": {
     "composer": {
@@ -38,16 +37,15 @@
     },
     "phpVersions": [
       "8.1",
-      "8.0",
-      "7.4"
+      "8.0"
     ],
     "variants": [
       "apache-bullseye",
       "fpm-bullseye",
       "apache-buster",
       "fpm-buster",
-      "fpm-alpine3.16",
-      "fpm-alpine3.15"
+      "fpm-alpine3.17",
+      "fpm-alpine3.16"
     ],
     "version": "9.3.22"
   },
@@ -57,17 +55,16 @@
     },
     "phpVersions": [
       "8.1",
-      "8.0",
-      "7.4"
+      "8.0"
     ],
     "variants": [
       "apache-bullseye",
       "fpm-bullseye",
       "apache-buster",
       "fpm-buster",
-      "fpm-alpine3.16",
-      "fpm-alpine3.15"
+      "fpm-alpine3.17",
+      "fpm-alpine3.16"
     ],
-    "version": "9.4.8"
+    "version": "9.4.9"
   }
 }
