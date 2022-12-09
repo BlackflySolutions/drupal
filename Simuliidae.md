@@ -19,5 +19,6 @@ git diff upstream/master origin/docker-library
 ## Maintenance
 
 When the docker-library upstream changes, the usual way to update the simuliidae branch is:
-1. git fetch upstream/master
-2. git merge upstream/master simuliidae
+1. git restore
+2. git fetch upstream/master
+3. git merge upstream/master simuliidae
