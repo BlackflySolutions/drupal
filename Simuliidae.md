@@ -22,3 +22,4 @@ When the docker-library upstream changes, the usual way to update the simuliidae
 1. git restore
 2. git fetch upstream
 3. git merge upstream/master simuliidae
+4. update.sh
