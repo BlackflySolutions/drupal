@@ -68,10 +68,10 @@ RUN set -eux; \
 		imap \
 	; \
 	\
-RUN pecl install -o imagick && docker-php-ext-enable imagick \
- && pecl install -o redis && docker-php-ext-enable redis \
- && pecl install -o apcu && docker-php-ext-enable apcu \
- && docker-php-ext-install exif \
+        pecl install -o imagick && docker-php-ext-enable imagick; \
+        pecl install -o redis && docker-php-ext-enable redis; \
+        pecl install -o apcu && docker-php-ext-enable apcu; \
+        docker-php-ext-install exif; \
 {{ if is_alpine then ( -}}
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
