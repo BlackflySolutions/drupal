@@ -20,7 +20,8 @@
   "7": {
     "md5": "ebd3b1ef8605585d703c13552f841731",
     "phpVersions": [
-      "8.0"
+      "8.0",
+      "7.4"
     ],
     "variants": [
       "apache-bullseye",
@@ -32,13 +33,26 @@
     ],
     "version": "7.95"
   },
+  "9.3": {
+    "composer": {
+      "version": "2"
+    },
+    "phpVersions": [
+      "7.4"
+    ],
+    "variants": [
+      "apache-buster"
+    ],
+    "version": "9.3.22"
+  },
   "9.4": {
     "composer": {
       "version": "2"
     },
     "phpVersions": [
       "8.1",
-      "8.0"
+      "8.0",
+      "7.4"
     ],
     "variants": [
       "apache-bullseye",
