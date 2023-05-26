@@ -20,7 +20,8 @@
   "7": {
     "md5": "37b63299e115a9e8863f564780a026e9",
     "phpVersions": [
-      "8.0"
+      "8.0",
+      "7.4"
     ],
     "variants": [
       "apache-bullseye",
