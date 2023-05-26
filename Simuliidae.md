@@ -28,7 +28,8 @@ git diff upstream/master -- Docker.template
 ## Maintenance
 
 When the docker-library upstream changes, the usual way to update the simuliidae branch is:
-1. git restore [get rid of the update.sh-generated modifications]
+1. git restore [get rid of the apply-templates.sh-generated modifications]
 2. git fetch upstream
 3. git merge upstream/master simuliidae
-4. update.sh
+4. git commit with manual fixes if necessary, then push [may need fixes to versions.json]
+5. ./apply-templates.sh
