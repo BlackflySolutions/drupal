@@ -14,7 +14,7 @@ It's forked only in the Docker.template file, and in two ways:
 
 To see details of the changes, use:
 
-git diff upstream/master -- Docker.template
+git diff upstream/master -- Dockerfile.template
 
 ## Notes
 
@@ -28,7 +28,7 @@ git diff upstream/master -- Docker.template
 ## Maintenance
 
 When the docker-library upstream changes, the usual way to update the simuliidae branch is:
-1. git restore [get rid of the apply-templates.sh-generated modifications]
+1. git checkout . [restore to upstream generated Dockerfiles, i.e. get rid of the apply-templates.sh-generated modifications]
 2. git fetch upstream
 3. git merge upstream/master simuliidae
 4. git commit with manual fixes if necessary, then push [may need fixes to versions.json]
