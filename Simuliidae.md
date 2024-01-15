@@ -8,9 +8,11 @@ The Simuliidae project uses this modified version of the Drupal docker project t
  
 This directory contains a lightly forked version of the official drupal docker project.
 
-It's forked only in the Docker.template file, and in two ways:
+It's forked in the Docker.template file in two ways:
 1. It converts the build to a multistage so we can build a version without the drupal code, i.e. a "bare" container.
 2. In includes additional packages and php extensions that are useful for CiviCRM (and sometimes Drupal) in production.
+
+And it's forked in the versions.json file to remove all but a single apache variant, and to add a civicrm version.
 
 To see details of the changes, use:
 
