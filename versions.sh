@@ -29,8 +29,8 @@ for version in "${versions[@]}"; do
 			drupalRelease="${rcVersion%%.*}.x"
 			;;
 		*)
-			# there is no https://updates.drupal.org/release-history/drupal/9.x
-			# (07/2020) current could also be used for 8.9, 9.x
+			# there is no https://updates.drupal.org/release-history/drupal/10.x
+			# (12/2023) current can be used for 10.x: "<supported_branches>10.0.,10.1.,10.2.</supported_branches>"
 			drupalRelease='current'
 			;;
 	esac
@@ -89,11 +89,13 @@ for version in "${versions[@]}"; do
 					version: env.fullVersion,
 					phpVersions: (
 						[
+							# https://www.drupal.org/project/drupal/releases/10.2.0-rc1#php-deps
+							# Drupal now supports PHP 8.3 and recommends at least PHP 8.2.
+							if [ "7", "10.0", "10.1" ] | index(env.version) then empty else "8.3" end,
 							"8.2",
-							"8.1",
+							if [ "7", "10.0", "10.1" ] | index(env.version) then "8.1" else empty end,
 							# https://www.drupal.org/docs/system-requirements/php-requirements
 							# https://www.drupal.org/docs/7/system-requirements/php-requirements
-							if env.version == "7" or (env.version | startswith("9.")) then "8.0" else empty end,
 							empty
 						]
 					),
@@ -101,10 +103,8 @@ for version in "${versions[@]}"; do
 				| .variants = [
 					"bookworm",
 					"bullseye",
-					if .phpVersions | index("8.0") then "buster" else empty end, # https://github.com/docker-library/php/blob/86b8b13760c7d7c6120fb635f6a1c84b22f33386/versions.sh#L99-L105
 					"alpine3.18",
 					"alpine3.17",
-					if .phpVersions | index("8.0") then "alpine3.16" else empty end, # https://github.com/docker-library/php/blob/0a68eaa2d3a269079c687e55abc960c77d3a134e/versions.sh#L94-L101
 					empty
 					| if startswith("alpine") then empty else "apache-" + . end,
 						"fpm-" + .
