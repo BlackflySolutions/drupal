@@ -43,6 +43,7 @@
     "date": 1701873806,
     "notes": "https://www.drupal.org/project/drupal/releases/7.99",
     "phpVersions": [
+      "7.4",
       "8.1"
     ],
     "variants": [
