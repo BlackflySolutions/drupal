@@ -55,8 +55,15 @@ RUN { \
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2024-01-17: https://www.drupal.org/project/drupal/releases/10.2.2
-ENV DRUPAL_VERSION 10.2.2
+# 2024-04-03: https://www.drupal.org/project/drupal/releases/10.2.5
+ENV DRUPAL_VERSION 10.2.5
+
+# https://github.com/docker-library/drupal/pull/259
+# https://github.com/moby/buildkit/issues/4503
+# https://github.com/composer/composer/issues/11839
+# https://github.com/composer/composer/issues/11854
+# https://github.com/composer/composer/blob/94fe2945456df51e122a492b8d14ac4b54c1d2ce/src/Composer/Console/Application.php#L217-L218
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
 WORKDIR /opt/drupal
 RUN set -eux; \
