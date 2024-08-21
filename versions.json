@@ -10,12 +10,7 @@
       "8.3"
     ],
     "variants": [
-      "apache-bookworm",
-      "fpm-bookworm",
-      "apache-bullseye",
-      "fpm-bullseye",
-      "fpm-alpine3.20",
-      "fpm-alpine3.19"
+      "apache-bookworm"
     ],
     "composer": {
       "version": "2"
@@ -31,14 +26,9 @@
     "phpVersions": [
       "8.3",
       "8.2"
-    ],
-    "variants": [
-      "apache-bookworm",
-      "fpm-bookworm",
-      "apache-bullseye",
-      "fpm-bullseye",
-      "fpm-alpine3.20",
-      "fpm-alpine3.19"
+     ],
+     "variants": [
+      "apache-bullseye"
     ],
     "composer": {
       "version": "2"
