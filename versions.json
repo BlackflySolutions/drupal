@@ -64,7 +64,7 @@
       "8.2"
     ],
     "variants": [
-      "apache-bookworm"
+      "apache-bullseye"
     ],
     "composer": {
       "version": "2"
