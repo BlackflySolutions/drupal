@@ -5,7 +5,7 @@
 #
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
-FROM php:8.4-fpm-bookworm
+FROM php:8.3-apache-bookworm
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -63,10 +63,17 @@ RUN { \
 		echo 'opcache.revalidate_freq=60'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# https://www.drupal.org/node/3298550
+# Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
+# e.g. with Apache's mod_php
+RUN { \
+		echo 'output_buffering=true'; \
+	} > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
+
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2025-11-06: https://www.drupal.org/project/drupal/releases/11.2.7
-ENV DRUPAL_VERSION 11.2.7
+# 2025-11-06: https://www.drupal.org/project/drupal/releases/11.3.0-alpha1
+ENV DRUPAL_VERSION 11.3.0-alpha1
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
