@@ -13,6 +13,7 @@ RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		coreutils \
 		freetype-dev \
+		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libwebp-dev \
@@ -22,6 +23,7 @@ RUN set -eux; \
 	; \
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg=/usr/include \
 		--with-webp \
@@ -54,8 +56,8 @@ RUN { \
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2026-05-20: https://www.drupal.org/project/drupal/releases/11.3.10
-ENV DRUPAL_VERSION 11.3.10
+# 2026-06-17: https://www.drupal.org/project/drupal/releases/11.3.12
+ENV DRUPAL_VERSION 11.3.12
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
