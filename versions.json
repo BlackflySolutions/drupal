@@ -14,7 +14,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.0"
+    "civicrmVersion": "6.19.1"
   },
   "11.4": {
     "version": "11.4.10",
@@ -32,7 +32,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.0"
+    "civicrmVersion": "6.19.1"
   },
   "11.3": {
     "version": "11.3.19",
@@ -50,7 +50,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.0"
+    "civicrmVersion": "6.19.1"
   },
   "10.6": {
     "version": "10.6.19",
@@ -68,7 +68,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.0"
+    "civicrmVersion": "6.19.1"
   },
   "7": {
     "civicrmVersion": "5.81.2",
